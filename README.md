@@ -1,5 +1,7 @@
 # frontend-tareas
 
+Con este proyecto, puedes ver como crear una app basica para gestionar tareas pendientes con vue.js .
+
 ## Project setup
 ```
 npm install
