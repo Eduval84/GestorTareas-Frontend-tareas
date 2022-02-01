@@ -21,11 +21,11 @@
                             <li v-for="(tarea,index) of listTareas" :key = "index" 
                                     class="list-group-item list-group-item d-flex justify-content-between">
                                 <span class="cursor" v-bind:class="{'text-success' : tarea.estado }"
-                                    v-on:click="modificarEstadoTarea(tarea, index)">
+                                    v-on:click="modificarEstadoTarea(tarea, tarea.id)">
                                     <i v-bind:class="[!tarea.estado ? 'far fa-circle' : 'far fa-check-circle']"></i>                                    
                                 </span>
                                 {{tarea.nombre}}
-                                <span class="text-danger cursor" v-on:click="eliminarTarea(index)">
+                                <span class="text-danger cursor" v-on:click="eliminarTarea(tarea.id)">
                                     <i class="fas fa-trash"></i>
                                 </span>
                             </li>
@@ -38,6 +38,8 @@
 </template>
 
 <script>
+    import axios from "axios"
+
     export default {
         name: 'Tarea',
         data() {
@@ -48,21 +50,40 @@
         },
         methods: {
             agregarTarea() {
-                const tarea = {
-                    nombre: this.tarea,
-                    estado: false
-                }
-                this.listTareas.push(tarea);
-                this.tarea = '';
-                 this.$refs.agregartareainput.focus();
+                    const tarea = {
+                        nombre: this.tarea,
+                        estado: false
+                    }
+                    axios.post("https://localhost:44369/api/Tarea",tarea).then(response => {
+                        console.log(response);
+                        this.tarea = '';               
+                        this.obtenerTareas();
+                    }).catch(error => {console.error();(error)
+                })             
+
             },
-            eliminarTarea(index) {
-                this.listTareas.splice(index , 1)
-                this.$refs.agregartareainput.focus();
+            eliminarTarea(id) {
+                    axios.delete("https://localhost:44369/api/Tarea/"+ id).then(response => {
+                    console.log(response)
+                    this.obtenerTareas();
+                }).catch(error => console.error(error))
+               
             },
-            modificarEstadoTarea(tarea, index){
-                this.listTareas[index].estado = !tarea.estado;
+            modificarEstadoTarea(tarea, id){
+                 axios.put("https://localhost:44369/api/Tarea/"+ id,tarea).then(response => {
+                    console.log(response)
+                    this.obtenerTareas();
+                }).catch(error => console.error(error))               
+            },
+            obtenerTareas(){
+                axios.get("https://localhost:44369/api/Tarea").then(response => {
+                    console.log(response)
+                    this.listTareas= response.data;
+                })                
             }
+        },
+        created: function(){
+            this.obtenerTareas();
         }
     }
 </script>
